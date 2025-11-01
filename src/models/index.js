@@ -24,6 +24,8 @@ const Farmer = require('./FarmersSchema')(sequelize, DataTypes);
 // const Notification = require('../models/NotificationSchema')(sequelize, DataTypes);
 const Order = require('../models/OrdersSchema')(sequelize, DataTypes);
 const OrderItem = require('../models/OrdersIteamSchema')(sequelize, DataTypes);
+const Cart = require('../models/CartSchema')(sequelize, DataTypes);
+const Payment = require('../models/PaymentSchema')(sequelize, DataTypes);
 
 // Define associations
 const models = {
@@ -33,7 +35,9 @@ const models = {
   Farmer,
   // Notification,
   Order,
-  OrderItem
+  OrderItem,
+  Cart,
+  Payment
 };
 
 // Call associate methods if they exist
@@ -63,5 +67,7 @@ module.exports = {
   Farmer,
   // Notification,
   Order,
-  OrderItem
+  OrderItem,
+  Cart,
+  Payment
 };

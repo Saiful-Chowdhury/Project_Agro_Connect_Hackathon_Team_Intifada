@@ -85,6 +85,18 @@ module.exports = () => {
           });
         }
       }
+
+      // Check email uniqueness if provided
+      if (email && email !== '') {
+        const existingEmailUser = await User.findOne({ where: { email: email.toLowerCase().trim() } });
+        if (existingEmailUser) {
+          return res.status(409).json({
+            success: false,
+            message: 'A user with this email already exists.'
+          });
+        }
+      }
+      
       // Hash password
       const salt = await bcrypt.genSalt(10);
       const password_hash = await bcrypt.hash(password, salt);
@@ -96,7 +108,7 @@ module.exports = () => {
         phone,
         password_hash,
         role,
-        is_verified: true // Phone users are auto-verified
+        // is_verified: true // Phone users are auto-verified
       });
 
       // Create role-specific profile if needed
@@ -115,6 +127,7 @@ module.exports = () => {
           dob
         });
       } else if (role === 'Buyer') {
+        //Check Uniqueness of Trade Licence
         if (!trade_licence) {
           await User.destroy({ where: { id: newUser.id } });
           return res.status(400).json({

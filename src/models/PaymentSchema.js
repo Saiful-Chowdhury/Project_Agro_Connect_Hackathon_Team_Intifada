@@ -1,16 +1,8 @@
+'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-  class Payment extends Model {
-    static associate(models) {
-      // Payment belongs to one Order
-      Payment.belongsTo(models.Order, {
-        foreignKey: 'order_id',
-        as: 'order'
-      });
-    }
-  }
-
-  Payment.init(
+  const Payment = sequelize.define(
+    'Payment',
     {
       id: {
         type: DataTypes.UUID,
@@ -71,13 +63,18 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     {
-      sequelize,
-      modelName: 'Payment',
       tableName: 'payments',
       timestamps: false,
       underscored: true
     }
   );
+
+  Payment.associate = function(models) {
+    Payment.belongsTo(models.Order, {
+      foreignKey: 'order_id',
+      as: 'order'
+    });
+  };
 
   return Payment;
 };

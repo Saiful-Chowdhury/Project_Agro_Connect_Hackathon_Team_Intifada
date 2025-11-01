@@ -37,10 +37,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: 'Others'
     },
-    product_image_url: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    }
+   product_image_url: {
+  type: DataTypes.TEXT,
+  allowNull: true
+}
   }, {
     tableName: 'products',
     timestamps: false,
