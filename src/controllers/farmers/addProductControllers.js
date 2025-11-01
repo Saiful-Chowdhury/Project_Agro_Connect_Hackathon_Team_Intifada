@@ -79,7 +79,7 @@ const getProducts = async (req, res) => {
 
 // POST /api/products — Add new product
 const createProduct = async (req, res) => {
-  const { name, description, price_per_unit, unit, available_quantity, harvest_date, product_category } = req.body;
+  const { name, description, price_per_unit, unit, available_quantity, harvest_date, product_category, product_image_url } = req.body;
   const farmer_id = req.user.id;
 
   try {
@@ -99,7 +99,8 @@ const createProduct = async (req, res) => {
       unit: unit?.trim() || 'kg',
       available_quantity: parseFloat(available_quantity),
       harvest_date: harvest_date || null,
-      product_category: product_category?.trim() || 'Others'
+      product_category: product_category?.trim() || 'Others',
+       product_image_url: product_image_url || null
     });
 
     res.status(201).json({
@@ -120,7 +121,7 @@ const createProduct = async (req, res) => {
 // PUT /api/products/:id — Update product
 const updateProduct = async (req, res) => {
   const { id } = req.params;
-  const { name, description, price_per_unit, unit, available_quantity, harvest_date, product_category } = req.body;
+  const { name, description, price_per_unit, unit, available_quantity, harvest_date, product_category, product_image_url } = req.body;
   const farmer_id = req.user.id;
 
   try {
@@ -140,6 +141,7 @@ const updateProduct = async (req, res) => {
       available_quantity: available_quantity !== undefined ? parseFloat(available_quantity) : product.available_quantity,
       harvest_date: harvest_date || product.harvest_date,
       product_category: product_category?.trim() || product.product_category,
+       product_image_url: product_image_url || product.product_image_url,
       updated_at: new Date()
     });
 
@@ -188,10 +190,41 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+// Single GET
+const getProductById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const product = await Product.findByPk(id, {
+            include: [{
+                model: Farmer,
+                as: 'farmer',
+                attributes: ['farm_location', 'nid']
+            }]
+        });
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found.'
+            });
+        }   
+        res.status(200).json({
+            success: true,
+            product
+        });
+    } catch (error) {
+        console.error('Get product by ID error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch product.'
+        });
+    }
+};
+
 module.exports = {
   createProduct,
   updateProduct,
   deleteProduct,
     ensureFarmer,
-    getProducts
+    getProducts,
+    getProductById
 };

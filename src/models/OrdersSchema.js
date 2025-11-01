@@ -17,9 +17,9 @@ module.exports = (sequelize, DataTypes) => {
     status: {
       type: DataTypes.STRING(20),
       defaultValue: 'pending',
-      validate: {
-        isIn: [['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']]
-      }
+      // validate: {
+      //   isIn: [['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']]
+      // }
     },
     delivery_address: DataTypes.TEXT,
     created_at: {

@@ -36,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: 'Others'
+    },
+    product_image_url: {
+      type: DataTypes.TEXT,
+      allowNull: true
     }
   }, {
     tableName: 'products',

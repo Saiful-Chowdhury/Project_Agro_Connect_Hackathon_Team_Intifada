@@ -1,6 +1,6 @@
 const { Product, Farmer } = require('../../models');
-const { Op,fn } = require('sequelize');
-const Sequelize = require('sequelize');
+const { Op, fn, col, Sequelize } = require('sequelize');
+
 // Helper: Validate if user is farmer
 const ensureFarmer = (req, res, next) => {
   if (req.user.role !== 'Farmer') {
@@ -75,8 +75,38 @@ const getProducts = async (req, res) => {
   }
 };
 
+// Single GET
+const getProductById = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const product = await Product.findByPk(productId, {
+            include: [{
+                model: Farmer,
+                as: 'farmer',
+                attributes: ['farm_location', 'nid']
+            }]
+        }); 
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found'
+            });
+        }
+        res.status(200).json({
+            success: true,
+            product
+        });
+    } catch (error) {
+        console.error('Fetch product by ID error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch product'
+        });
+    }
+};
 
 module.exports = {
     ensureFarmer,
-    getProducts
+    getProducts,
+    getProductById
 };
