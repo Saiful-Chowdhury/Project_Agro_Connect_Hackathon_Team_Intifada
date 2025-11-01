@@ -4,7 +4,7 @@ const { Op, fn, col,Sequelize } = require('sequelize');
 
 // Check Role Is Admin Middleware
 const isAdmin = (req, res, next) => {
-    if (req.user && req.user.role === 'admin') {
+    if (req.user && req.user.role === 'Admin') {
         next(); 
     } else {
         return res.status(403).json({ success: false, message: 'Access denied. Admins only.' });

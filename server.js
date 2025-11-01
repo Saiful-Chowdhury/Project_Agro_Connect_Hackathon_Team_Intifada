@@ -35,6 +35,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 // --- API Routes ---
+// Increase JSON payload limit (e.g., to 10 MB)
+app.use(express.json({ limit: '100mb' }));
+
+// If you also accept URL-encoded forms (e.g., from HTML forms)
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
+
 
 app.use('/api/auth', authRoutes);
 // app.use('/api/admin/auth', adminAuthRoutes);
