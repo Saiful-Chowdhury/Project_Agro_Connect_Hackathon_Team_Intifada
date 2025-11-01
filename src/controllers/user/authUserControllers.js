@@ -7,10 +7,10 @@ const { v4: uuidv4 } = require('uuid'); // For generating unique placeholder ema
 
 module.exports = () => {
   // Helper: Generate placeholder email if none provided
-  const generatePlaceholderEmail = (phone) => {
-    return `phoneuser.${Date.now()}.${Math.random().toString(36).substring(2)}@agroconnect.local`;
-    // Or: `${phone.replace(/\D/g, '')}@agroconnect.local` — but ensure uniqueness!
-  };
+  // const generatePlaceholderEmail = (phone) => {
+  //   return `phoneuser.${Date.now()}.${Math.random().toString(36).substring(2)}@agroconnect.local`;
+  //   // Or: `${phone.replace(/\D/g, '')}@agroconnect.local` — but ensure uniqueness!
+  // };
 
   const generateTokens = (user) => {
     const accessTokenPayload = {
@@ -74,12 +74,9 @@ module.exports = () => {
         });
       }
 
-      // Generate placeholder email (since DB requires it)
-      // const email = generatePlaceholderEmail(phone);
-      const email = email ? email.toLowerCase().trim() : generatePlaceholderEmail(phone);
-
       // Check regex email format if provided
-      if (email && email !== '' ) {
+      if (email && email !== '') {
+         email = email.toLowerCase().trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
           return res.status(400).json({
