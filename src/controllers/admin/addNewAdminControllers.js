@@ -6,11 +6,6 @@ const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid'); // For generating unique placeholder emails
 
 module.exports = () => {
-  // Helper: Generate placeholder email if none provided
-  // const generatePlaceholderEmail = (phone) => {
-  //   return `phoneuser.${Date.now()}.${Math.random().toString(36).substring(2)}@agroconnect.local`;
-  //   // Or: `${phone.replace(/\D/g, '')}@agroconnect.local` — but ensure uniqueness!
-  // };
 
   const generateTokens = (user) => {
     const accessTokenPayload = {
@@ -92,7 +87,7 @@ module.exports = () => {
       // Create base user
       const newUser = await User.create({
         name,
-        email, 
+        email: email ? email.toLowerCase().trim() : null, 
         phone,
         password_hash,
         role,
@@ -147,65 +142,7 @@ module.exports = () => {
     }
   };
 
-  const phoneSignIn = async (req, res) => {
-    const { phone, password } = req.body;
-
-    if (!phone || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Phone number and password are required.'
-      });
-    }
-
-    try {
-      const user = await User.findOne({ where: { phone } });
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: 'No account found with this phone number.'
-        });
-      }
-
-      if (!user.password_hash) {
-        return res.status(400).json({
-          success: false,
-          message: 'This account uses social login. Please contact support.'
-        });
-      }
-
-      const isMatch = await bcrypt.compare(password, user.password_hash);
-      if (!isMatch) {
-        return res.status(401).json({
-          success: false,
-          message: 'Incorrect password.'
-        });
-      }
-
-      const { accessToken, refreshToken } = generateTokens(user);
-      res.status(200).json({
-        success: true,
-        message: 'Login successful.',
-        accessToken,
-        refreshToken,
-        user: {
-          id: user.id,
-          name: user.name,
-          phone: user.phone,
-          role: user.role
-        }
-      });
-
-    } catch (error) {
-      console.error('Phone sign-in error:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Internal server error during login.'
-      });
-    }
-  };
-
   return {
     phoneSignUp,
-    phoneSignIn
   };
 };

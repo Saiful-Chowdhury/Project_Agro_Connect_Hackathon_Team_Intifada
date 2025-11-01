@@ -8,11 +8,17 @@ const { sequelize } = require('./src/models');
 // INITIALIZE FIREBASE ADMIN: This happens only once, after dotenv has loaded.
 // const admin = require('./src/config/firebaseAdmin');
 
-// User Route File
-const userProfileRoutes = require('./src/routes/user/userProfileRoutes.js');
+// Farmer Route File
+const userProfileRoutes = require('./src/routes/farmers/userProfileRoutes.js');
+const addProductRoute = require('./src/routes/farmers/addProductRoute');
+
+
+
+// Buyers Route File
+const seeProductsRoute = require('./src/routes/buyers/seeProductsRoute.js');
 
 // We call the factory functions, passing dependencies as needed.
-const authRoutes = require('./src/routes/user/authUserRoute.js')(/* dependencies if any */);
+const authRoutes = require('./src/routes/farmers/authUserRoute.js')(/* dependencies if any */);
 const tokenRoutes = require('./src/routes/common/tokenRoutes.js');
 
 // Admin Route File
@@ -33,9 +39,16 @@ app.use('/api/auth', authRoutes);
 
 // Admin Routes
 app.use('/api/auth/token', tokenRoutes);
+
+
 // User Routes
 app.use('/api/user/profile', userProfileRoutes);
 
+// Farmer Routes
+app.use('/api/farmer/products', addProductRoute);
+
+// Buyer Routes
+app.use('/api/buyer/products', seeProductsRoute);
 
 // --- Server Startup Function ----
 async function startServer() {

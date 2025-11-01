@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../../middlewares/middleWare');
-const profileController = require('../../controllers/user/userProfileControllers');
+const profileController = require('../../controllers/farmers/userProfileControllers');
 
 router.get('/me', authenticateToken, profileController.getProfile);
 router.put('/me', authenticateToken, profileController.updateProfile);

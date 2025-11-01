@@ -31,6 +31,11 @@ module.exports = (sequelize, DataTypes) => {
     updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
+    },
+    product_category: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: 'Others'
     }
   }, {
     tableName: 'products',

@@ -5,7 +5,7 @@ module.exports = (admin) => {
   const {
       phoneSignUp,
       phoneSignIn
-  } = require('../../controllers/user/authUserControllers')(admin);
+  } = require('../../controllers/farmers/authUserControllers')(admin);
 
   router.post('/phone/signup', phoneSignUp);
   router.post('/phone/signin', phoneSignIn);
