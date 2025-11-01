@@ -1,5 +1,5 @@
 // controllers/authController.js
-const { User, Donor } = require('../../models');
+const { User} = require('../../models');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
@@ -29,7 +29,7 @@ module.exports = () => {
   };
 
   const phoneSignUp = async (req, res) => {
-    const { phone, password, name, role, donor = 'No', farm_location, business_name, trade_licence, nid, application_id, dob } = req.body;
+    const { phone, password, email,name, role,farm_location, business_name, trade_licence, nid, application_id, dob } = req.body;
 
     // Validate required fields
     if (!phone || !password || !name || !role) {
@@ -52,7 +52,7 @@ module.exports = () => {
     if (!phoneRegex.test(phone)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid phone number. Must be 11 digits starting with 013–019.'
+        message: 'Invalid phone number. Must be 11 digits starting with 01.'
       });
     }
 
@@ -75,8 +75,19 @@ module.exports = () => {
       }
 
       // Generate placeholder email (since DB requires it)
-      const email = generatePlaceholderEmail(phone);
+      // const email = generatePlaceholderEmail(phone);
+      const email = email ? email.toLowerCase().trim() : generatePlaceholderEmail(phone);
 
+      // Check regex email format if provided
+      if (email && email !== '' ) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid email format.'
+          });
+        }
+      }
       // Hash password
       const salt = await bcrypt.genSalt(10);
       const password_hash = await bcrypt.hash(password, salt);
@@ -84,7 +95,7 @@ module.exports = () => {
       // Create base user
       const newUser = await User.create({
         name,
-        email, // placeholder
+        email, 
         phone,
         password_hash,
         role,
@@ -121,13 +132,6 @@ module.exports = () => {
         });
       }
 
-      // Handle donor status (if applicable — e.g., for blood donation feature)
-      if (donor === 'Yes') {
-        await Donor.findOrCreate({
-          where: { user_id: newUser.id },
-          defaults: { user_id: newUser.id, is_active: true }
-        });
-      }
 
       const { accessToken, refreshToken } = generateTokens(newUser);
       res.status(201).json({

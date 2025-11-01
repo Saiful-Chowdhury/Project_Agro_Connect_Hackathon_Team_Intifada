@@ -1,5 +1,5 @@
 // controllers/profileController.js
-const { User, Farmer, Buyer } = require('../models');
+const { User, Farmer, Buyer } = require('../../models');
 const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
 

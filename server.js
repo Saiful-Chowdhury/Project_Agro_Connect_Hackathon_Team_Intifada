@@ -9,7 +9,7 @@ const { sequelize } = require('./src/models');
 // const admin = require('./src/config/firebaseAdmin');
 
 // User Route File
-// const authRoutesFactory = require('./src/routes/user/authUserRoute.js');
+const userProfileRoutes = require('./src/routes/user/userProfileRoutes.js');
 
 // We call the factory functions, passing dependencies as needed.
 const authRoutes = require('./src/routes/user/authUserRoute.js')(/* dependencies if any */);
@@ -32,9 +32,9 @@ app.use('/api/auth', authRoutes);
 // app.use('/api/admin/auth', adminAuthRoutes);
 
 // Admin Routes
-// app.use('/api/auth', tokenRoutes);
+app.use('/api/auth/token', tokenRoutes);
 // User Routes
-// app.use('/api/user/product', donorRoutes);
+app.use('/api/user/profile', userProfileRoutes);
 
 
 // --- Server Startup Function ----
