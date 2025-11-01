@@ -76,7 +76,7 @@ module.exports = () => {
 
       // Check regex email format if provided
       if (email && email !== '') {
-         email = email.toLowerCase().trim();
+        //  email = email.toLowerCase().trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
           return res.status(400).json({
