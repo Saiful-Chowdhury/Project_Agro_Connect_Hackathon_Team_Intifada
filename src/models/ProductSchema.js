@@ -5,10 +5,10 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true
     },
-   farmer_id: {
+    farmer_id: {
       type: DataTypes.UUID,
-      allowNull: false,
-      references: { model: 'farmers', key: 'user_id' }
+      allowNull: false
+ 
     },
     name: {
       type: DataTypes.STRING(100),
@@ -37,10 +37,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: 'Others'
     },
-   product_image_url: {
-  type: DataTypes.TEXT,
-  allowNull: true
-}
+    product_image_url: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    }
   }, {
     tableName: 'products',
     timestamps: false,
@@ -48,7 +48,10 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Product.associate = (models) => {
-    Product.belongsTo(models.Farmer, { foreignKey: 'farmer_id', as: 'farmer' });
+    Product.belongsTo(models.Farmer, { 
+      foreignKey: 'farmer_id', 
+      as: 'farmer' 
+    });
   };
 
   return Product;

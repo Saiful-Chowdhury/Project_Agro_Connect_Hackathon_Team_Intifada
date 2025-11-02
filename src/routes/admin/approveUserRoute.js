@@ -6,6 +6,6 @@ const { isAdmin,getPendingUsers,approveUser,allUsers} = require('../../controlle
 
 router.get('/pending', authenticateToken, isAdmin,getPendingUsers);
 router.put('/approve/:userId', authenticateToken,isAdmin, approveUser);
-router.put('/all', authenticateToken,isAdmin, allUsers);
+router.get('/all', authenticateToken,isAdmin, allUsers);
 
 module.exports=router;
