@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../../middlewares/middleWare');
+
 const { 
   addToCart, 
   getCart, 
@@ -12,7 +13,7 @@ const {
 
 router.post('/cart', authenticateToken, addToCart);
 router.get('/cart', authenticateToken, getCart);
-router.post('/confirm', authenticateToken,confirmOrder);
+router.post('/confirm/:id', authenticateToken,confirmOrder);
 router.get('/:id', authenticateToken,getOrderStatus);
 router.delete('/cart/:id', authenticateToken,removeFromCart);
 

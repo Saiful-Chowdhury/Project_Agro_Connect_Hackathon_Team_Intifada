@@ -1,6 +1,17 @@
 // const { User, Buyer, Product, Cart, Order, OrderItem, Payment } = require('../../models');
-const { User, Buyer, Product, Cart, Order, OrderItem, Payment, Farmer, Notification } = require('../../models');
-const { Op, fn, col,Sequelize } = require('sequelize');
+const {
+  User,
+  Buyer,
+  Product,
+  Cart,
+  Order,
+  OrderItem,
+  Payment,
+  Farmer,
+  Notification,
+  sequelize 
+} = require('../../models');
+const { Op, fn, col, Sequelize } = require('sequelize');
 
 // 1. ADD TO CART
 const addToCart = async (req, res) => {
@@ -55,6 +66,8 @@ const getCart = async (req, res) => {
 };
 
 // 3. CONFIRM ORDER + CREATE PAYMENT
+
+// 3. CONFIRM ORDER + CREATE PAYMENT
 const confirmOrder = async (req, res) => {
   const { delivery_address, payment_method } = req.body;
   const buyer_id = req.user.id;
@@ -70,10 +83,13 @@ const confirmOrder = async (req, res) => {
 
   const t = await sequelize.transaction();
   try {
-    // Fetch cart items with product data
+    // Fetch cart with product (using correct alias)
     const cartItems = await Cart.findAll({
       where: { buyer_id },
-      include: [{ model: Product }]
+      include: [{
+        model: Product,
+        as: 'product' // ✅
+      }]
     });
 
     if (cartItems.length === 0) {
@@ -81,14 +97,14 @@ const confirmOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Cart is empty' });
     }
 
-    // Calculate total
+    // Validate stock and calculate total
     let total = 0;
     for (const item of cartItems) {
-      if (item.quantity > item.Product.available_quantity) {
+      if (item.quantity > item.product.available_quantity) {
         await t.rollback();
-        return res.status(400).json({ success: false, message: `Insufficient stock for ${item.Product.name}` });
+        return res.status(400).json({ success: false, message: `Insufficient stock for ${item.product.name}` });
       }
-      total += item.quantity * item.Product.price_per_unit;
+      total += item.quantity * item.product.price_per_unit;
     }
 
     // Create order
@@ -106,52 +122,42 @@ const confirmOrder = async (req, res) => {
         order_id: order.id,
         product_id: item.product_id,
         quantity: item.quantity,
-        unit_price: item.Product.price_per_unit
+        unit_price: item.product.price_per_unit
       });
 
-      // Reduce available quantity
+      // Reduce stock using Sequelize.literal
       await Product.update(
-        { available_quantity: sequelize.literal(`available_quantity - ${item.quantity}`) },
+        { 
+          available_quantity: Sequelize.literal(`available_quantity - ${item.quantity}`) 
+        },
         { where: { id: item.product_id } },
         { transaction: t }
       );
     }
     await OrderItem.bulkCreate(orderItems, { transaction: t });
 
-    // For Sending Notification to Farmers
-    // ... after creating order and orderItems ...
+    // Notify farmers
+    const farmerNotifications = {};
+    for (const item of cartItems) {
+      const farmerId = item.product.farmer_id;
+      if (!farmerNotifications[farmerId]) {
+        farmerNotifications[farmerId] = [];
+      }
+      farmerNotifications[farmerId].push(item.product.name);
+    }
 
-// Reduce stock & collect farmer info
-const farmerNotifications = {};
-for (const item of cartItems) {
-  // Reduce stock
-  await Product.update(
-    { available_quantity: sequelize.literal(`available_quantity - ${item.quantity}`) },
-    { where: { id: item.product_id } },
-    { transaction: t }
-  );
+    for (const [farmerUserId, productNames] of Object.entries(farmerNotifications)) {
+      await Notification.create({
+        user_id: farmerUserId,
+        title: 'New Order Received',
+        message: `You have a new order for: ${productNames.join(', ')}. Order ID: ${order.id}`,
+        type: 'order',
+        related_order_id: order.id,
+        created_at: new Date()
+      }, { transaction: t });
+    }
 
-  // Track for notification
-  const farmerId = item.Product.farmer_id;
-  if (!farmerNotifications[farmerId]) {
-    farmerNotifications[farmerId] = [];
-  }
-  farmerNotifications[farmerId].push(item.Product.name);
-}
-
-// Create notifications
-for (const [farmerUserId, productNames] of Object.entries(farmerNotifications)) {
-  await Notification.create({
-    user_id: farmerUserId,
-    title: 'New Order Received',
-    message: `You have a new order for: ${productNames.join(', ')}. Order ID: ${order.id}`,
-    type: 'order',
-    related_order_id: order.id,
-    created_at: new Date()
-  }, { transaction: t });
-}
-     
-    // Create payment record
+    // Create payment
     await Payment.create({
       order_id: order.id,
       amount: total,

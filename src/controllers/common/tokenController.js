@@ -27,6 +27,7 @@ const refreshAccessToken = async (req, res) => {
             email: user.email,
             phone:user.phone,
             role: user.role, // 'Farmer', 'Buyer', 'Admin'
+            is_verified: user.is_verified
         };
 
         const newAccessToken = jwt.sign(
