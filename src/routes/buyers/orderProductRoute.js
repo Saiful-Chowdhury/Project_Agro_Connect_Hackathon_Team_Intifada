@@ -6,13 +6,15 @@ const {
   getCart, 
   confirmOrder, 
   getOrderStatus,
-  updatePaymentStatus 
+  updatePaymentStatus,
+  removeFromCart
 } = require('../../controllers/buyers/orderProductControllers');
 
 router.post('/cart', authenticateToken, addToCart);
 router.get('/cart', authenticateToken, getCart);
 router.post('/confirm', authenticateToken,confirmOrder);
 router.get('/:id', authenticateToken,getOrderStatus);
+router.delete('/cart/:id', authenticateToken,removeFromCart);
 
 // For payment gateway webhook (protect with secret key in production!)
 router.post('/payment/update', updatePaymentStatus);

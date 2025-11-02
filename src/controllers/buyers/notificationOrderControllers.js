@@ -1,5 +1,6 @@
 const { User, Buyer, Farmer, Notification } = require('../../models');
-const { Op, fn, col,Sequelize } = require('sequelize');
+const { Op, fn, col, Sequelize } = require('sequelize');
+
 // GET /api/notifications
 const getNotifications = async (req, res) => {
   const { page = 1, limit = 20 } = req.query;

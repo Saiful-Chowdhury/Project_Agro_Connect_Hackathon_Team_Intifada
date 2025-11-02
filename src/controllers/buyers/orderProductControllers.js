@@ -223,10 +223,45 @@ const updatePaymentStatus = async (req, res) => {
   }
 };
 
+// DELETE /api/cart/:product_id
+const removeFromCart = async (req, res) => {
+  const { product_id } = req.params;
+  const buyer_id = req.user.id;
+
+  try {
+    const result = await Cart.destroy({
+      where: {
+        buyer_id,
+        product_id
+      }
+    });
+
+    if (result === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Cart item not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Item removed from cart'
+    });
+  } catch (error) {
+    console.error('Remove from cart error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to remove item from cart'
+    });
+  }
+};
+
 module.exports = {
   addToCart,
   getCart,
   confirmOrder,
   getOrderStatus,
-  updatePaymentStatus
+  updatePaymentStatus,
+  removeFromCart
+
 };
