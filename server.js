@@ -17,6 +17,7 @@ const addProductRoute = require('./src/routes/farmers/addProductRoute');
 // Buyers Route File
 const seeProductsRoute = require('./src/routes/buyers/seeProductsRoute.js');
 const orderProductRoute = require('./src/routes/buyers/orderProductRoute.js');
+const notificationOrderRoutes = require('./src/routes/buyers/notificationOrderRoutes.js');
 
 // We call the factory functions, passing dependencies as needed.
 const authRoutes = require('./src/routes/farmers/authUserRoute.js')(/* dependencies if any */);
@@ -59,6 +60,7 @@ app.use('/api/farmer/products', addProductRoute);
 // Buyer Routes
 app.use('/api/buyer/products', seeProductsRoute);
 app.use('/api/buyer/orders', orderProductRoute);
+app.use('/api/buyer/notifications', notificationOrderRoutes);
 
 // --- Server Startup Function ----
 async function startServer() {

@@ -21,7 +21,7 @@ const User = require('../models/UserSchema')(sequelize, DataTypes);
 const Product = require('./ProductSchema')(sequelize, DataTypes);
 const Buyer = require('../models/BuyerSchema')(sequelize, DataTypes);
 const Farmer = require('./FarmersSchema')(sequelize, DataTypes);
-// const Notification = require('../models/NotificationSchema')(sequelize, DataTypes);
+const Notification = require('../models/NotificationSchema')(sequelize, DataTypes);
 const Order = require('../models/OrdersSchema')(sequelize, DataTypes);
 const OrderItem = require('../models/OrdersIteamSchema')(sequelize, DataTypes);
 const Cart = require('../models/CartSchema')(sequelize, DataTypes);
@@ -33,7 +33,7 @@ const models = {
   Product,
   Buyer,
   Farmer,
-  // Notification,
+  Notification,
   Order,
   OrderItem,
   Cart,
@@ -65,7 +65,7 @@ module.exports = {
   Product,
   Buyer,
   Farmer,
-  // Notification,
+  Notification,
   Order,
   OrderItem,
   Cart,

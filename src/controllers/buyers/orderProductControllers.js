@@ -1,4 +1,5 @@
-const { User, Buyer, Product, Cart, Order, OrderItem, Payment } = require('../../models');
+// const { User, Buyer, Product, Cart, Order, OrderItem, Payment } = require('../../models');
+const { User, Buyer, Product, Cart, Order, OrderItem, Payment, Farmer, Notification } = require('../../models');
 const { Op, fn, col,Sequelize } = require('sequelize');
 
 // 1. ADD TO CART
@@ -117,6 +118,39 @@ const confirmOrder = async (req, res) => {
     }
     await OrderItem.bulkCreate(orderItems, { transaction: t });
 
+    // For Sending Notification to Farmers
+    // ... after creating order and orderItems ...
+
+// Reduce stock & collect farmer info
+const farmerNotifications = {};
+for (const item of cartItems) {
+  // Reduce stock
+  await Product.update(
+    { available_quantity: sequelize.literal(`available_quantity - ${item.quantity}`) },
+    { where: { id: item.product_id } },
+    { transaction: t }
+  );
+
+  // Track for notification
+  const farmerId = item.Product.farmer_id;
+  if (!farmerNotifications[farmerId]) {
+    farmerNotifications[farmerId] = [];
+  }
+  farmerNotifications[farmerId].push(item.Product.name);
+}
+
+// Create notifications
+for (const [farmerUserId, productNames] of Object.entries(farmerNotifications)) {
+  await Notification.create({
+    user_id: farmerUserId,
+    title: 'New Order Received',
+    message: `You have a new order for: ${productNames.join(', ')}. Order ID: ${order.id}`,
+    type: 'order',
+    related_order_id: order.id,
+    created_at: new Date()
+  }, { transaction: t });
+}
+     
     // Create payment record
     await Payment.create({
       order_id: order.id,

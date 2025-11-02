@@ -12,21 +12,58 @@ const isAdmin = (req, res, next) => {
 };
 
 
-// Find All Users Pending Approval
+// Get All Usersif Buyer then include Buyer details and if Farmer then include Farmer details
+const allUsers = async (req, res) => {
+    try {
+        const users = await User.findAll({
+            attributes: ['id', 'name', 'email', 'phone', 'role', 'is_verified', 'created_at'],
+            include: [
+                {
+                    model: Buyer,
+                    attributes: ['business_name', 'business_address', 'trade_licence'],
+                    required: false
+                },
+                {
+                    model: Farmer,
+                    attributes: ['nid', 'application_id', 'farm_location', 'dob'],
+                    required: false
+                }
+            ]
+        });
+        res.status(200).json({ success: true, users });
+    } catch (error) {
+        console.error('Get all users error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch users' });
+    }
+};
 
+// Find All Users Pending Approval if Buyer then include Buyer details and if Farmer then include Farmer details
 const getPendingUsers = async (req, res) => {
     try {
         const pendingUsers = await User.findAll({
             where: { is_verified: false },
-            attributes: ['id', 'name', 'email', 'phone', 'role', 'created_at']
+            attributes: ['id', 'name', 'email', 'phone', 'role', 'created_at'],
+            include: [
+                {
+                    model: Buyer,   
+                    attributes: ['business_name', 'business_address', 'trade_licence'],
+                    required: false
+                },
+                {
+                    model: Farmer,
+                    attributes: ['nid', 'application_id', 'farm_location', 'dob'],
+                    required: false
+                }
+            ]
         });
-        res.status(200).json({ success: true, users: pendingUsers });
-    } catch (error) {
+        res.status(200).json({ success: true, pendingUsers });
+    }
+    catch (error) {
         console.error('Get pending users error:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch pending users' });
     }
 };
-
+    
 // APPROVE USER REGISTRATION
 const approveUser = async (req, res) => {
     const { userId } = req.params;
@@ -48,7 +85,8 @@ const approveUser = async (req, res) => {
 module.exports = {
     approveUser,
     getPendingUsers,
-    isAdmin
+    isAdmin,
+    allUsers
 };
 
 
